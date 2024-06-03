@@ -12,22 +12,26 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { useChainId, useReadContract } from "wagmi"
-import crowdFundJson from "../../../smart_contracts/artifacts/contracts/CrowdFund.sol/CrowdFund.json";
+import { crowdFundABI } from "@/constants";
 import { addresses } from "../../constants/addresses"
+import { formatEther, parseEther } from "viem"
+import { dateToUnixTime, unixTimeToDate} from "@/lib/utils"
 
 export default function Campaigns() {
-  const [param, setParam] = useState(1);
+  const [param, setParam] = useState(0);
   const chainId = useChainId();
   const { data, isError, isLoading, error, refetch } = useReadContract({
-    abi: crowdFundJson.abi,
+    abi: crowdFundABI,
     address: addresses[chainId].crowdFund,
     functionName: 'campaigns',
     args: [param],
   });
+
+  const campaignData = (data:any) => data?.toString().split(",");
   
   return(
     <div className="flex flex-row justify-center">
-      <Card className="w-[350px]">
+      <Card className="w-[550px]">
         <CardHeader>
           <CardTitle>Campaign</CardTitle>
           <CardDescription>Enter a camapign ID to learn more</CardDescription>
@@ -45,7 +49,16 @@ export default function Campaigns() {
         <CardFooter className="flex justify-between">
           {isLoading && <p>Loading...</p>}
           {isError && <p>Error occurred, {error.message}</p>}
-          {data ? (<div><p>Creator {data.toString()}</p><p>Campaign {data.toString()}</p></div>) : <></>}
+          {data ? (
+            <div>
+              <p>Creator: {campaignData(data)[0]}</p>
+              <p>Goal: {formatEther(campaignData(data)[1])}</p>
+              <p>Pledged: {formatEther(campaignData(data)[2])}</p>
+              <p>Start Time: {unixTimeToDate(campaignData(data)[3])}</p>
+              <p>End Time: {unixTimeToDate(campaignData(data)[4])}</p>
+              <p>Claimed: {campaignData(data)[5]}</p>
+            </div>
+          ) : <></>}
         </CardFooter>
       </Card>
     </div>

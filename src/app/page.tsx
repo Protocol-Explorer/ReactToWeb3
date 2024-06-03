@@ -14,14 +14,14 @@ import { toast } from "sonner";
 import { useReadContract } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import {Claim, Campaigns, Refund, Launch, Pledges} from "../components/tabs";
-import crowdFundJson from "../../smart_contracts/artifacts/contracts/CrowdFund.sol/CrowdFund.json";
+import { crowdFundABI } from "@/constants";
 import { addresses } from "../constants/addresses"
 
 export default function Home() {
   const { open } = useWeb3Modal();
   const chainId = useChainId();
   const {data: campaignCount, isError, isFetched } = useReadContract({
-    abi: crowdFundJson.abi,
+    abi: crowdFundABI,
     address: addresses[chainId].crowdFund,
     functionName: 'count'
   })
