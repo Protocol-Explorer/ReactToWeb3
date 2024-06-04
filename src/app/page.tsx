@@ -18,11 +18,18 @@ import { crowdFundABI } from "@/constants";
 import { addresses } from "../constants/addresses"
 
 export default function Home() {
+  const { isConnected } = useAccount();
   const { open } = useWeb3Modal();
   const chainId = useChainId();
+
+  const handleConnect = () => {
+    open();
+  };
+
+  console.log({chainId})
   const {data: campaignCount, isError, isFetched } = useReadContract({
     abi: crowdFundABI,
-    address: addresses[chainId].crowdFund,
+    address: addresses[chainId]?.crowdFund || "",
     functionName: 'count'
   })
 
@@ -43,6 +50,13 @@ export default function Home() {
         <p className="text-2xl text-muted-foreground">
           Total Campaigns Supported {campaignCount?.toString()}
         </p>
+        {!isConnected ? (
+          <Button onClick={handleConnect}>Connect Wallet</Button>
+        ) : (
+          <>
+            <Button onClick={handleConnect}>User Info</Button>
+          </>
+        )}
       </section>
       <div className="flex gap-6 items-center justify-center">
         <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
