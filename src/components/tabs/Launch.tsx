@@ -39,11 +39,9 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 export default function Launch() {
-  const [goal, setGoal] = useState(0);
-  const [startTime, setStartTime] = useState<Date>();
-  const [endTime, setEndTime] = useState<Date>();
 
   const chainId = useChainId();
+  const stringToNumber = z.string().transform((val) => parseInt(val));
 
   const { data: hash, writeContract, isError, error } = useWriteContract()
   const FormSchema = z.object({
@@ -62,6 +60,7 @@ export default function Launch() {
   })
 
   async function submit(data: z.infer<typeof FormSchema>) {
+    console.log(data.endTime, data.goal, data.startTime)
     writeContract({
       address: addresses[chainId].crowdFund,
       abi: crowdFundABI,
@@ -82,10 +81,22 @@ export default function Launch() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(submit)}>
               <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="goal">Fundraising Goal</Label>
-                  <Input id="campaign" value={goal} type="number" onChange={(e) => setGoal(Number(e.target.value))} />
-                </div>
+              <FormField
+                control={form.control}
+                name="goal"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fundraising Goal</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Goal" {...field} value={} />
+                    </FormControl>
+                    <FormDescription>
+                      Fundraising Goal
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
                 <div className="flex flex-col space-y-1.5">
                 <FormField
                   control={form.control}
@@ -169,7 +180,6 @@ export default function Launch() {
                     </FormItem>
                   )}
                 />
-                
                 <Button className="mt-6">Submit</Button>
                 </div>
               </div>
