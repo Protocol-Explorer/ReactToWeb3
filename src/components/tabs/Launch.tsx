@@ -8,9 +8,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   useChainId,
   useWriteContract,
@@ -18,7 +17,6 @@ import {
 } from "wagmi";
 import { crowdFundABI } from "@/constants";
 import { addresses } from "../../constants/addresses";
-import { formatEther, parseEther } from "viem";
 import { cn, dateToUnixTime, unixTimeToDate } from "@/lib/utils";
 import { Calendar as CalendarIcon } from "lucide-react";
 import {
@@ -59,14 +57,13 @@ export default function Launch() {
     goal: z.number({
       required_error: "A fundraising goal is required",
       coerce: true,
-    }),
+    }), 
   });
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
 
   async function submit(data: z.infer<typeof FormSchema>) {
-    console.log(data.endTime, data.goal, data.startTime);
     writeContract({
       address: addresses[chainId].crowdFund,
       abi: crowdFundABI,
